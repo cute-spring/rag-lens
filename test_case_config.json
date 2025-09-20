@@ -1,0 +1,11 @@
+{
+  "test_case_sources": {
+    "local_default": "test_cases_local.json",
+    "real_collection": "real_test_cases_collection.json",
+    "complete_enhanced": "COMPLETE_TEST_SUITE.json",
+    "sample_reference": "sample_test_case_reference.json"
+  },
+  "default_source": "local_default",
+  "current_source": "test_cases_local.json",
+  "description": "Configuration file for test case source selection"
+}

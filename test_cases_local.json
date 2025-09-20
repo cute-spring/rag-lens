@@ -1,0 +1,48 @@
+[
+  {
+    "name": "Sample: Machine Learning Fundamentals",
+    "description": "A sample test case demonstrating machine learning concepts",
+    "query": "What are the key principles of machine learning?",
+    "system_prompt": "You are an expert in machine learning and artificial intelligence. Provide comprehensive, accurate answers based on the provided context.",
+    "user_instruction": "Focus on explaining the core principles with practical examples.",
+    "expected_answer": "Machine learning is based on principles like data-driven learning, pattern recognition, generalization, optimization, feature engineering, and regularization. These enable AI systems to learn from data and improve performance.",
+    "rerank_params": {
+      "semantic_weight": 0.5,
+      "freshness_weight": 0.2,
+      "quality_weight": 0.3,
+      "relevance_threshold": 0.6,
+      "top_n": 10
+    },
+    "chunks": [
+      {
+        "id": "ml_chunk_001",
+        "title": "Machine Learning Fundamentals",
+        "content": "# Machine Learning Principles\n\nMachine learning represents a paradigm shift from traditional programming, where algorithms learn from data rather than following explicit rules.\n\n## Core Principles\n\n**1. Data-Driven Learning**\n- Algorithms learn from examples rather than explicit programming\n- Quality and quantity of training data directly impact performance\n- Requires representative datasets that capture the problem space\n\n**2. Pattern Recognition**\n- Identifies underlying patterns in complex datasets\n- Uses statistical methods to find correlations and relationships\n- Enables prediction and classification tasks\n\n**3. Generalization**\n- Ability to apply learned patterns to new, unseen data\n- Critical for real-world deployment\n- Measured through validation and testing metrics",
+        "user_rating": 5,
+        "publish_time": "2024-01-15T10:30:00",
+        "effective_time": "2024-02-01T00:00:00",
+        "expiration_time": "2026-01-15T23:59:59"
+      },
+      {
+        "id": "ml_chunk_002",
+        "title": "ML Applications and Methods",
+        "content": "# Machine Learning Applications\n\n## Types of Machine Learning\n\n### Supervised Learning\n- **Classification**: Categorizing data into predefined classes\n- **Regression**: Predicting continuous values\n- **Examples**: Spam detection, price prediction, image classification\n\n### Unsupervised Learning\n- **Clustering**: Grouping similar data points\n- **Dimensionality Reduction**: Reducing feature space\n- **Examples**: Customer segmentation, anomaly detection\n\n### Reinforcement Learning\n- **Agent-based learning**: Learning through interaction\n- **Reward optimization**: Maximizing cumulative rewards\n- **Examples**: Game playing, robotics, recommendation systems\n\n## Real-World Applications\n\n- **Healthcare**: Disease diagnosis, drug discovery, personalized treatment\n- **Finance**: Fraud detection, algorithmic trading, risk assessment\n- **Technology**: Image recognition, natural language processing, autonomous vehicles\n- **Business**: Customer segmentation, demand forecasting, recommendation systems",
+        "user_rating": 4,
+        "publish_time": "2024-02-20T14:15:00",
+        "effective_time": "2024-03-01T00:00:00",
+        "expiration_time": "2026-02-20T23:59:59"
+      }
+    ],
+    "domain": "technology",
+    "difficulty_level": "intermediate",
+    "tags": [
+      "machine learning",
+      "AI",
+      "fundamentals",
+      "tutorial"
+    ],
+    "id": "d84c1d85-8c8e-4254-84ef-052ecb1da7b9",
+    "created_at": "2025-09-19T16:20:56.192141",
+    "updated_at": "2025-09-19T16:20:56.192141"
+  }
+]

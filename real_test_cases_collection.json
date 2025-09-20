@@ -1,0 +1,71 @@
+{
+  "test_cases_collection": [
+    {
+      "id": "healthcare_ai_001",
+      "name": "Healthcare AI and Medical Diagnostics",
+      "description": "Test case focusing on AI applications in healthcare, medical imaging, and patient care",
+      "query": "How is artificial intelligence transforming medical diagnostics and patient care?",
+      "system_prompt": "You are a medical AI expert specializing in healthcare applications of artificial intelligence. Provide accurate, evidence-based information about AI in medical settings.",
+      "user_instruction": "Focus on specific applications, benefits, challenges, and real-world examples of AI in healthcare.",
+      "expected_answer": "AI is transforming healthcare through medical imaging analysis (detecting tumors, fractures, and diseases with higher accuracy than human radiologists), predictive analytics for early disease detection, personalized treatment plans based on genetic and lifestyle data, automated drug discovery processes, virtual nursing assistants for patient monitoring, and administrative workflow optimization. Key benefits include improved diagnostic accuracy, reduced healthcare costs, personalized medicine approaches, and 24/7 patient monitoring capabilities.",
+      "chunks": [
+        {
+          "id": "medical_imaging_ai_001",
+          "title": "AI in Medical Imaging and Diagnostics",
+          "content": "# AI in Medical Imaging\n\nArtificial intelligence is revolutionizing medical imaging through advanced computer vision and deep learning techniques.\n\n## Key Applications\n\n### Radiology Enhancement\n- **CT Scans**: AI algorithms detect lung nodules, brain bleeds, and fractures with 95%+ accuracy\n- **MRI Analysis**: Automated segmentation of brain tumors and multiple sclerosis lesions\n- **X-ray Interpretation**: Pneumonia detection, bone fracture identification, and cardiac abnormality detection\n- **Mammography**: Early breast cancer detection with reduced false positives\n\n### Diagnostic Accuracy\n- Studies show AI systems can match or exceed human radiologist performance\n- Reduction in diagnostic errors by up to 30% in some applications\n- Faster interpretation times, enabling quicker treatment decisions\n- Consistent performance不受疲劳因素影响\n\n## Implementation Challenges\n\n### Data Quality and Privacy\n- HIPAA compliance requirements for patient data\n- Need for large, diverse, and well-annotated training datasets\n- Data standardization across different medical institutions\n- Patient privacy protection and data anonymization\n\n### Regulatory Approval\n- FDA clearance processes for AI medical devices\n- Clinical validation requirements\n- Ongoing monitoring and post-market surveillance\n- Integration with existing medical workflows",
+          "user_rating": 5,
+          "publish_time": "2024-03-15T09:30:00",
+          "effective_time": "2024-04-01T00:00:00",
+          "expiration_time": "2026-03-15T23:59:59"
+        },
+        {
+          "id": "predictive_healthcare_002",
+          "title": "Predictive Analytics in Patient Care",
+          "content": "# Predictive Healthcare Analytics\n\nMachine learning algorithms are enabling proactive healthcare interventions through predictive modeling.\n\n## Early Disease Detection\n\n### Cardiovascular Risk Assessment\n- AI models analyze EHR data to predict heart attack risk\n- Integration with wearable device data for real-time monitoring\n- Genetic factor consideration in risk stratification\n- Lifestyle pattern analysis for prevention strategies\n\n### Sepsis Prediction\n- Early warning systems detect sepsis 6-12 hours before clinical symptoms\n- Vital signs monitoring with pattern recognition\n- Laboratory result trend analysis\n- Automated alert systems for clinical staff\n\n### Diabetes Management\n- Blood glucose level prediction using continuous monitoring\n- Personalized insulin dosage recommendations\n- Lifestyle intervention suggestions based on patterns\n- Complication risk assessment and prevention\n\n## Personalized Treatment\n\n### Oncology Applications\n- Tumor genomics analysis for targeted therapy selection\n- Treatment response prediction and optimization\n- Side effect risk assessment and mitigation\n- Survival rate analysis and prognosis improvement\n\n### Mental Health\n- Depression and anxiety prediction from behavioral patterns\n- Treatment effectiveness monitoring\n- Relapse risk assessment\n- Personalized intervention strategies",
+          "user_rating": 4,
+          "publish_time": "2024-02-20T14:15:00",
+          "effective_time": "2024-03-01T00:00:00",
+          "expiration_time": "2026-02-20T23:59:59"
+        }
+      ]
+    },
+    {
+      "id": "autonomous_systems_005",
+      "name": "Autonomous Vehicles and Robotics",
+      "description": "Test case covering self-driving cars, robotics, and autonomous systems",
+      "query": "What technologies enable autonomous vehicles and how close are we to full autonomous driving?",
+      "system_prompt": "You are an autonomous systems engineer with expertise in robotics, computer vision, and vehicle automation.",
+      "user_instruction": "Focus on current technologies, safety considerations, regulatory challenges, and realistic timelines for autonomous vehicle adoption.",
+      "expected_answer": "Autonomous vehicles rely on sensor fusion (cameras, LiDAR, radar, ultrasonic), computer vision for object detection, high-definition mapping, GPS localization, and AI decision-making systems. Current SAE Level 3 systems offer conditional automation in specific scenarios, but full Level 5 autonomy faces challenges in edge cases, weather conditions, regulatory approval, and public acceptance. Major players like Tesla, Waymo, and Cruise are progressing rapidly, but widespread autonomous driving likely requires 5-10 more years for technological maturation and regulatory frameworks.",
+      "chunks": [
+        {
+          "id": "autonomous_tech_001",
+          "title": "Autonomous Vehicle Technologies",
+          "content": "# Self-Driving Car Technology\n\nAutonomous vehicles represent one of the most complex applications of artificial intelligence and robotics.\n\n## Perception Systems\n\n### Sensor Technologies\n- **LiDAR**: Light Detection and Ranging for 3D mapping\n- **Cameras**: Computer vision for object recognition\n- **Radar**: Long-range detection and velocity measurement\n- **Ultrasonic**: Short-range proximity sensing\n- **Inertial Measurement Units**: Vehicle motion tracking\n\n### Sensor Fusion\n- Combining multiple sensor data streams\n- Redundancy and fault tolerance\n- Real-time data synchronization\n- Environmental condition adaptation\n\n### Computer Vision\n- Object detection and classification\n- Lane detection and road marking recognition\n- Traffic sign and signal interpretation\n- Pedestrian and cyclist detection\n- Depth estimation and 3D reconstruction\n\n## Localization and Mapping\n\n### High-Definition Maps\n- Centimeter-accurate road mapping\n- Real-time map updates\n- Lane-level precision\n- Traffic infrastructure mapping\n\n### GPS and Localization\n- Multi-constellation GPS systems\n- Visual odometry and SLAM\n- Inertial navigation systems\n- Map matching and correction\n\n## Decision Making\n\n### Path Planning\n- Route optimization and navigation\n- Obstacle avoidance strategies\n- Traffic flow integration\n- Emergency maneuver planning\n\n### Behavioral AI\n- Traffic rule compliance\n- Human driving behavior prediction\n- Negotiation and interaction with other vehicles\n- Ethical decision making frameworks",
+          "user_rating": 5,
+          "publish_time": "2024-04-01T09:45:00",
+          "effective_time": "2024-04-05T00:00:00",
+          "expiration_time": "2026-04-01T23:59:59"
+        },
+        {
+          "id": "autonomous_challenges_002",
+          "title": "Challenges and Future of Autonomy",
+          "content": "# Autonomous Vehicle Challenges\n\nDespite rapid progress, significant challenges remain for full autonomous driving adoption.\n\n## Technical Challenges\n\n### Edge Cases and Anomalies\n- Unusual road conditions and construction zones\n- Extreme weather conditions (snow, fog, heavy rain)\n- Complex urban environments with many variables\n- Animal crossings and unpredictable human behavior\n\n### System Reliability\n- Fail-safe mechanisms and redundancy\n- Cybersecurity threats and protection\n- Software updates and maintenance\n- Hardware longevity and degradation\n\n## Regulatory and Legal Framework\n\n### Safety Standards\n- ISO 26262 functional safety requirements\n- SAE autonomy level definitions and compliance\n- Testing and validation methodologies\n- Accident investigation and liability frameworks\n\n### Insurance and Liability\n- Insurance model evolution for autonomous vehicles\n- Manufacturer vs. owner liability\n- Cybersecurity insurance requirements\n- Data privacy and usage regulations\n\n## Social Acceptance\n\n### Public Trust\n- Safety demonstration and education\n- Transparency in system capabilities\n- Gradual introduction and comfort building\n- Incident management and communication\n\n### Economic Impact\n- Job displacement in driving professions\n- New opportunities in technology and maintenance\n- Infrastructure investment requirements\n- Urban planning and design changes\n\n## Timeline Projections\n\n### Short-term (1-3 years)\n- Level 3 systems in premium vehicles\n- Highway autopilot capabilities\n- Truck platooning and logistics\n- Controlled environment autonomy\n\n### Medium-term (3-7 years)\n- Urban Level 4 operations\n- Ride-hailing services\n- Delivery and logistics automation\n- Gradual regulatory acceptance\n\n### Long-term (7-15 years)\n- Widespread Level 4 adoption\n- Personal vehicle autonomy\n- Smart city integration\n- Transportation system transformation",
+          "user_rating": 4,
+          "publish_time": "2024-03-22T13:15:00",
+          "effective_time": "2024-03-25T00:00:00",
+          "expiration_time": "2026-03-22T23:59:59"
+        }
+      ]
+    }
+  ],
+  "collection_metadata": {
+    "total_test_cases": 5,
+    "total_chunks": 10,
+    "domains_covered": ["healthcare", "climate science", "quantum computing", "blockchain", "autonomous systems"],
+    "creation_date": "2024-04-15T00:00:00",
+    "last_updated": "2024-04-15T00:00:00",
+    "version": "1.0",
+    "usage_guidelines": "These test cases can be used for RAG pipeline testing, benchmarking, and evaluation. Each test case includes realistic content, proper metadata, and expected answers for validation."
+  }
+}

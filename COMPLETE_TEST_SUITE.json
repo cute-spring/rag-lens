@@ -1,0 +1,357 @@
+{
+  "test_cases_collection": [
+    {
+      "id": "core_functionality_001",
+      "name": "Core Functionality - Single Source Fact Extraction",
+      "description": "Test basic fact extraction from a single relevant document chunk",
+      "query": "A公司的CEO是谁？",
+      "system_prompt": "You are a professional assistant specializing in information extraction and factual accuracy. Provide precise answers based on the given document chunks.",
+      "user_instruction": "Extract the key information accurately from the provided chunks and cite sources when possible.",
+      "expected_answer": "A公司的CEO是张三。",
+      "chunks": [
+        {
+          "id": "chunk_ceo_info_001",
+          "title": "Company Leadership Information",
+          "content": "A公司今日宣布，其创始人张三将继续担任CEO。B公司的CEO是李四。",
+          "user_rating": 5,
+          "publish_time": "2024-01-15T10:30:00",
+          "effective_time": "2024-01-15T00:00:00",
+          "expiration_time": "2026-01-15T23:59:59"
+        }
+      ]
+    },
+    {
+      "id": "core_functionality_002",
+      "name": "Core Functionality - Multi-source Information Integration",
+      "description": "Test combining information from different document chunks into a coherent answer",
+      "query": "介绍一下项目X的目标和截止日期。",
+      "system_prompt": "You are a project management expert specializing in synthesizing information from multiple sources.",
+      "user_instruction": "Integrate information from all relevant chunks to provide a comprehensive answer about the project.",
+      "expected_answer": "项目X的主要目标是提升用户活跃度20%，其截止日期是今年第四季度末。",
+      "chunks": [
+        {
+          "id": "project_goal_001",
+          "title": "Project X Objectives",
+          "content": "项目X的主要目标是提升用户活跃度20%。",
+          "user_rating": 4,
+          "publish_time": "2024-02-01T14:00:00",
+          "effective_time": "2024-02-01T00:00:00",
+          "expiration_time": "2026-02-01T23:59:59"
+        },
+        {
+          "id": "project_timeline_001",
+          "title": "Project X Timeline",
+          "content": "根据最新计划，项目X必须在今年第四季度末完成。",
+          "user_rating": 4,
+          "publish_time": "2024-02-01T14:05:00",
+          "effective_time": "2024-02-01T00:00:00",
+          "expiration_time": "2026-02-01T23:59:59"
+        }
+      ]
+    },
+    {
+      "id": "robustness_001",
+      "name": "Robustness - Irrelevant Information Filtering",
+      "description": "Test ability to filter out irrelevant information and focus on what's important",
+      "query": "项目Alpha的负责人是谁？",
+      "system_prompt": "You are an information filtering expert. Identify and extract only relevant information while ignoring irrelevant content.",
+      "user_instruction": "Focus specifically on information about project Alpha's leadership and ignore unrelated details.",
+      "expected_answer": "项目Alpha的负责人是王五。",
+      "chunks": [
+        {
+          "id": "project_alpha_lead_001",
+          "title": "Project Alpha Leadership",
+          "content": "项目Alpha由王五领导。",
+          "user_rating": 5,
+          "publish_time": "2024-03-01T09:15:00",
+          "effective_time": "2024-03-01T00:00:00",
+          "expiration_time": "2026-03-01T23:59:59"
+        },
+        {
+          "id": "project_beta_budget_001",
+          "title": "Project Beta Budget Information",
+          "content": "项目Beta的预算是50万美元。",
+          "user_rating": 3,
+          "publish_time": "2024-03-01T09:20:00",
+          "effective_time": "2024-03-01T00:00:00",
+          "expiration_time": "2026-03-01T23:59:59"
+        },
+        {
+          "id": "company_financial_001",
+          "title": "Company Financial Performance",
+          "content": "公司去年的财报非常亮眼。",
+          "user_rating": 2,
+          "publish_time": "2024-03-01T09:25:00",
+          "effective_time": "2024-03-01T00:00:00",
+          "expiration_time": "2026-03-01T23:59:59"
+        }
+      ]
+    },
+    {
+      "id": "robustness_002",
+      "name": "Robustness - Conflicting Information Resolution",
+      "description": "Test handling of contradictory information across different sources",
+      "query": "会议室A的密码是多少？",
+      "system_prompt": "You are an information resolution expert. Handle conflicting information by identifying temporal precedence and logical consistency.",
+      "user_instruction": "Resolve conflicting information by prioritizing the most recent and authoritative sources.",
+      "expected_answer": "根据最新通知，会议室A的密码是5678。早前的信息显示密码为1234，但已被更新。",
+      "chunks": [
+        {
+          "id": "meeting_room_old_pass_001",
+          "title": "Legacy Meeting Room Password",
+          "content": "【2022年邮件】会议室A密码是1234。",
+          "user_rating": 3,
+          "publish_time": "2022-05-15T11:00:00",
+          "effective_time": "2022-05-15T00:00:00",
+          "expiration_time": "2023-05-15T23:59:59"
+        },
+        {
+          "id": "meeting_room_new_pass_001",
+          "title": "Updated Meeting Room Password",
+          "content": "【2023年最新通知】因安全升级，会议室A密码已更新为5678。",
+          "user_rating": 5,
+          "publish_time": "2023-06-01T10:00:00",
+          "effective_time": "2023-06-01T00:00:00",
+          "expiration_time": "2025-06-01T23:59:59"
+        }
+      ]
+    },
+    {
+      "id": "reasoning_001",
+      "name": "Reasoning - Multi-hop Inference",
+      "description": "Test multi-step reasoning requiring intermediate information discovery",
+      "query": "CEO的直属助理是谁？",
+      "system_prompt": "You are a logical reasoning expert. Perform multi-step inference to connect related pieces of information.",
+      "user_instruction": "You need to first identify who the CEO is, then find information about that person's assistant.",
+      "expected_answer": "CEO的直属助理是赵六。",
+      "chunks": [
+        {
+          "id": "company_ceo_001",
+          "title": "Company CEO Information",
+          "content": "公司CEO是张三。",
+          "user_rating": 5,
+          "publish_time": "2024-01-10T09:00:00",
+          "effective_time": "2024-01-10T00:00:00",
+          "expiration_time": "2026-01-10T23:59:59"
+        },
+        {
+          "id": "ceo_assistant_001",
+          "title": "CEO Assistant Information",
+          "content": "张三的直属助理是赵六。",
+          "user_rating": 5,
+          "publish_time": "2024-01-10T09:05:00",
+          "effective_time": "2024-01-10T00:00:00",
+          "expiration_time": "2026-01-10T23:59:59"
+        },
+        {
+          "id": "other_assistant_001",
+          "title": "Other Staff Assistant",
+          "content": "李四的助理是孙七。",
+          "user_rating": 3,
+          "publish_time": "2024-01-10T09:10:00",
+          "effective_time": "2024-01-10T00:00:00",
+          "expiration_time": "2026-01-10T23:59:59"
+        }
+      ]
+    },
+    {
+      "id": "multilingual_001",
+      "name": "Multilingual - Cross-language Information Integration",
+      "description": "Test ability to integrate information from multiple languages",
+      "query": "这个国际项目的目标和预算是什么？",
+      "system_prompt": "You are a multilingual information integration expert. Synthesize information from different languages into a coherent response.",
+      "user_instruction": "Integrate information from English, Spanish, and Chinese sources to provide a comprehensive answer about the international project.",
+      "expected_answer": "国际项目Alpha的目标是将用户参与度提高30%，预算为200万美元，将在三个国家实施。",
+      "chunks": [
+        {
+          "id": "project_goal_en_001",
+          "title": "Project Alpha Goal (English)",
+          "content": "Project Alpha aims to increase user engagement by 30%.",
+          "user_rating": 5,
+          "publish_time": "2024-02-15T10:00:00",
+          "effective_time": "2024-02-15T00:00:00",
+          "expiration_time": "2026-02-15T23:59:59"
+        },
+        {
+          "id": "project_budget_es_001",
+          "title": "Project Alpha Budget (Spanish)",
+          "content": "El presupuesto del proyecto Alpha es de 2 millones de dólares.",
+          "user_rating": 5,
+          "publish_time": "2024-02-15T10:05:00",
+          "effective_time": "2024-02-15T00:00:00",
+          "expiration_time": "2026-02-15T23:59:59"
+        },
+        {
+          "id": "project_scope_zh_001",
+          "title": "Project Alpha Scope (Chinese)",
+          "content": "该项目将在三个国家实施。",
+          "user_rating": 4,
+          "publish_time": "2024-02-15T10:10:00",
+          "effective_time": "2024-02-15T00:00:00",
+          "expiration_time": "2026-02-15T23:59:59"
+        }
+      ]
+    },
+    {
+      "id": "temporal_001",
+      "name": "Temporal - Timeline Organization",
+      "description": "Test ability to organize events chronologically and understand temporal relationships",
+      "query": "整理一下产品发布的完整时间线",
+      "system_prompt": "You are a temporal reasoning expert. Organize events in chronological order and provide timeline analysis.",
+      "user_instruction": "Extract all temporal information and organize it into a clear chronological sequence.",
+      "expected_answer": "产品发布时间线：2023年1月完成产品设计→3月通过原型测试→6月开始小批量生产→9月正式上市销售。整个过程历时8个月。",
+      "chunks": [
+        {
+          "id": "product_design_complete_001",
+          "title": "Product Design Completion",
+          "content": "2023年1月完成产品设计",
+          "user_rating": 5,
+          "publish_time": "2023-01-31T17:00:00",
+          "effective_time": "2023-01-31T00:00:00",
+          "expiration_time": "2025-01-31T23:59:59"
+        },
+        {
+          "id": "prototype_test_pass_001",
+          "title": "Prototype Testing Success",
+          "content": "2023年3月通过原型测试",
+          "user_rating": 5,
+          "publish_time": "2023-03-31T17:00:00",
+          "effective_time": "2023-03-31T00:00:00",
+          "expiration_time": "2025-03-31T23:59:59"
+        },
+        {
+          "id": "small_batch_production_001",
+          "title": "Small Batch Production Start",
+          "content": "2023年6月开始小批量生产",
+          "user_rating": 5,
+          "publish_time": "2023-06-30T17:00:00",
+          "effective_time": "2023-06-30T00:00:00",
+          "expiration_time": "2025-06-30T23:59:59"
+        },
+        {
+          "id": "official_launch_001",
+          "title": "Official Product Launch",
+          "content": "2023年9月正式上市销售",
+          "user_rating": 5,
+          "publish_time": "2023-09-30T17:00:00",
+          "effective_time": "2023-09-30T00:00:00",
+          "expiration_time": "2025-09-30T23:59:59"
+        }
+      ]
+    },
+    {
+      "id": "domain_specific_001",
+      "name": "Domain Specific - Healthcare AI Applications",
+      "description": "Test domain-specific knowledge in healthcare AI and medical diagnostics",
+      "query": "人工智能在医疗诊断中有哪些主要应用？",
+      "system_prompt": "You are a healthcare AI expert specializing in medical diagnostics and AI applications in healthcare.",
+      "user_instruction": "Provide comprehensive information about AI applications in medical diagnostics, focusing on specific technologies and benefits.",
+      "expected_answer": "AI在医疗诊断中的主要应用包括：医学影像分析（CT、MRI、X射线的肿瘤和疾病检测）、预测分析（早期疾病检测）、个性化治疗方案制定、自动化药物发现、虚拟护士助理和行政工作流程优化。这些技术提高了诊断准确性，降低了医疗成本，实现了个性化医疗方法。",
+      "chunks": [
+        {
+          "id": "medical_imaging_ai_001",
+          "title": "AI in Medical Imaging and Diagnostics",
+          "content": "# AI in Medical Imaging\n\nArtificial intelligence is revolutionizing medical imaging through advanced computer vision and deep learning techniques.\n\n## Key Applications\n\n### Radiology Enhancement\n- **CT Scans**: AI algorithms detect lung nodules, brain bleeds, and fractures with 95%+ accuracy\n- **MRI Analysis**: Automated segmentation of brain tumors and multiple sclerosis lesions\n- **X-ray Interpretation**: Pneumonia detection, bone fracture identification, and cardiac abnormality detection\n- **Mammography**: Early breast cancer detection with reduced false positives\n\n### Diagnostic Accuracy\n- Studies show AI systems can match or exceed human radiologist performance\n- Reduction in diagnostic errors by up to 30% in some applications\n- Faster interpretation times, enabling quicker treatment decisions\n- Consistent performance not affected by fatigue factors",
+          "user_rating": 5,
+          "publish_time": "2024-03-15T09:30:00",
+          "effective_time": "2024-04-01T00:00:00",
+          "expiration_time": "2026-03-15T23:59:59"
+        },
+        {
+          "id": "predictive_healthcare_002",
+          "title": "Predictive Analytics in Patient Care",
+          "content": "# Predictive Healthcare Analytics\n\nMachine learning algorithms are enabling proactive healthcare interventions through predictive modeling.\n\n## Early Disease Detection\n\n### Cardiovascular Risk Assessment\n- AI models analyze EHR data to predict heart attack risk\n- Integration with wearable device data for real-time monitoring\n- Genetic factor consideration in risk stratification\n- Lifestyle pattern analysis for prevention strategies\n\n### Sepsis Prediction\n- Early warning systems detect sepsis 6-12 hours before clinical symptoms\n- Vital signs monitoring with pattern recognition\n- Laboratory result trend analysis\n- Automated alert systems for clinical staff",
+          "user_rating": 4,
+          "publish_time": "2024-02-20T14:15:00",
+          "effective_time": "2024-03-01T00:00:00",
+          "expiration_time": "2026-02-20T23:59:59"
+        }
+      ]
+    },
+    {
+      "id": "quantum_reasoning_001",
+      "name": "Quantum Computing - Technical Concepts and Applications",
+      "description": "Test understanding of quantum computing concepts and real-world applications",
+      "query": "量子计算的核心原理是什么，它有哪些实际应用？",
+      "system_prompt": "You are a quantum computing expert with deep knowledge of quantum mechanics and computational theory.",
+      "user_instruction": "Explain quantum computing principles in accessible terms and highlight current and potential real-world applications.",
+      "expected_answer": "量子计算的核心原理包括量子叠加（qubit同时处于多个状态）、量子纠缠（qubit间的关联）和量子干涉（操控概率波）。实际应用包括：密码学（Shor算法破解RSA加密）、优化问题（物流、金融建模）、药物发现（分子模拟）、机器学习加速、材料科学和人工智能。目前技术仍面临量子相干性和错误校正等挑战。",
+      "chunks": [
+        {
+          "id": "quantum_principles_001",
+          "title": "Quantum Computing Fundamentals",
+          "content": "# Quantum Computing Principles\n\n## Core Concepts\n\n### Quantum Superposition\n- Qubits can exist in multiple states simultaneously\n- Unlike classical bits that are either 0 or 1\n- Enables parallel processing of information\n- Measured using probability amplitudes\n\n### Quantum Entanglement\n- Correlation between qubits regardless of distance\n- 'Spooky action at a distance' (Einstein)\n- Enables quantum teleportation and superdense coding\n- Fundamental for quantum computing power\n\n### Quantum Interference\n- Manipulation of probability waves\n- Constructive and destructive interference patterns\n- Key for quantum algorithm design\n- Enables amplification of correct answers",
+          "user_rating": 5,
+          "publish_time": "2024-04-01T10:00:00",
+          "effective_time": "2024-04-01T00:00:00",
+          "expiration_time": "2026-04-01T23:59:59"
+        },
+        {
+          "id": "quantum_applications_001",
+          "title": "Quantum Computing Applications",
+          "content": "# Real-World Quantum Applications\n\n## Current Applications\n\n### Cryptography\n- Shor's algorithm for factoring large numbers\n- Breaking RSA encryption systems\n- Quantum key distribution (QKD)\n- Post-quantum cryptography development\n\n### Optimization Problems\n- Logistics and supply chain optimization\n- Financial portfolio management\n- Traffic flow optimization\n- Machine learning model training\n\n### Scientific Computing\n- Molecular simulation for drug discovery\n- Materials science research\n- Climate modeling\n- High-energy physics simulations",
+          "user_rating": 4,
+          "publish_time": "2024-04-01T10:05:00",
+          "effective_time": "2024-04-01T00:00:00",
+          "expiration_time": "2026-04-01T23:59:59"
+        }
+      ]
+    },
+    {
+      "id": "complex_reasoning_001",
+      "name": "Complex Reasoning - Causal Analysis",
+      "description": "Test ability to identify and explain causal relationships between events",
+      "query": "为什么公司利润下降了？",
+      "system_prompt": "You are a business analyst expert in causal reasoning and root cause analysis.",
+      "user_instruction": "Analyze the provided information to identify causal relationships and explain the reasons behind the profit decline.",
+      "expected_answer": "公司利润下降8%的主要原因有两个：一是供应链中断导致生产成本增加15%，二是竞争对手推出更具价格优势的产品。",
+      "chunks": [
+        {
+          "id": "supply_chain_issue_001",
+          "title": "Supply Chain Disruption Impact",
+          "content": "由于供应链中断，生产成本增加了15%。",
+          "user_rating": 5,
+          "publish_time": "2024-03-10T14:00:00",
+          "effective_time": "2024-03-10T00:00:00",
+          "expiration_time": "2026-03-10T23:59:59"
+        },
+        {
+          "id": "competition_pressure_001",
+          "title": "Competitive Market Pressure",
+          "content": "主要竞争对手推出了更具价格优势的产品。",
+          "user_rating": 4,
+          "publish_time": "2024-03-10T14:05:00",
+          "effective_time": "2024-03-10T00:00:00",
+          "expiration_time": "2026-03-10T23:59:59"
+        },
+        {
+          "id": "profit_decline_001",
+          "title": "Financial Performance Results",
+          "content": "公司利润同比下降了8%。",
+          "user_rating": 5,
+          "publish_time": "2024-03-10T14:10:00",
+          "effective_time": "2024-03-10T00:00:00",
+          "expiration_time": "2026-03-10T23:59:59"
+        }
+      ]
+    }
+  ],
+  "collection_metadata": {
+    "total_test_cases": 10,
+    "total_chunks": 22,
+    "domains_covered": [
+      "core_functionality",
+      "robustness",
+      "reasoning",
+      "multilingual",
+      "temporal",
+      "healthcare",
+      "quantum_computing",
+      "business_analysis"
+    ],
+    "creation_date": "2024-09-20T00:00:00",
+    "last_updated": "2024-09-20T00:00:00",
+    "version": "2.0",
+    "usage_guidelines": "This enhanced test suite covers multiple dimensions of RAG system evaluation including core functionality, robustness, reasoning capabilities, multilingual processing, temporal understanding, and domain-specific knowledge. Each test case includes realistic content, proper metadata, and expected answers for validation."
+  }
+}
