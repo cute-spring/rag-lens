@@ -475,6 +475,237 @@ class CrossEncoderProvider(BaseAPIProvider):
         return response
 
 
+class OllamaRerankProvider(BaseAPIProvider):
+    """Ollama provider for re-ranking using local models"""
+
+    def __init__(self, base_url: str = "http://localhost:11434", model: str = "nomic-embed-text", api_key: str = None):
+        super().__init__(base_url=base_url, api_key=api_key)
+        self.model = model
+        # Ollama doesn't require API key authentication by default
+        if not api_key:
+            # Remove Authorization header for Ollama
+            if 'Authorization' in self.session.headers:
+                del self.session.headers['Authorization']
+
+    def health_check(self) -> APIResponse:
+        """Check Ollama server health"""
+        try:
+            # Check if Ollama is running by listing models
+            response = self.make_request("GET", "/api/tags")
+            if response.success:
+                models = response.data.get("models", [])
+                model_names = [model.get("name", "") for model in models]
+                if self.model in model_names or any(self.model in name for name in model_names):
+                    return APIResponse(
+                        success=True,
+                        data={"status": "healthy", "model_available": True, "available_models": model_names},
+                        metadata={"model": self.model}
+                    )
+                else:
+                    return APIResponse(
+                        success=False,
+                        error_message=f"Model '{self.model}' not found in Ollama. Available models: {model_names}",
+                        error_code="OLLAMA_MODEL_NOT_FOUND"
+                    )
+            return response
+        except Exception as e:
+            return APIResponse(
+                success=False,
+                error_message=f"Ollama health check failed: {str(e)}",
+                error_code="OLLAMA_HEALTH_CHECK_FAILED"
+            )
+
+    def execute_pipeline_step(self, step_number: int, data: Dict[str, Any]) -> APIResponse:
+        """Execute pipeline step using Ollama"""
+        if step_number == 5:  # Re-ranking
+            return self._rerank_candidates(data)
+        else:
+            return APIResponse(
+                success=False,
+                error_message=f"Ollama provider only supports re-ranking (step 5)",
+                error_code="UNSUPPORTED_STEP"
+            )
+
+    def _rerank_candidates(self, data: Dict[str, Any]) -> APIResponse:
+        """Re-rank candidates using Ollama BGE reranker model"""
+        query = data.get("query", "")
+        candidates = data.get("candidates", [])
+        
+        if not query or not candidates:
+            return APIResponse(
+                success=False,
+                error_message="Query and candidates are required for re-ranking",
+                error_code="MISSING_RERANK_DATA"
+            )
+
+        try:
+            # Check if this is a dedicated reranker model (like BGE reranker)
+            if "reranker" in self.model.lower() or "bge-reranker" in self.model.lower():
+                return self._rerank_with_dedicated_model(query, candidates)
+            else:
+                # Fallback to embedding-based reranking for other models
+                return self._rerank_with_embeddings(query, candidates)
+            
+        except Exception as e:
+            return APIResponse(
+                success=False,
+                error_message=f"Ollama re-ranking failed: {str(e)}",
+                error_code="OLLAMA_RERANK_ERROR"
+            )
+    
+    def _rerank_with_dedicated_model(self, query: str, candidates: List[Dict[str, Any]]) -> APIResponse:
+        """Re-rank using dedicated reranker model via Ollama generate API"""
+        scored_candidates = []
+        
+        for i, candidate in enumerate(candidates):
+            candidate_text = candidate.get("text", "") if isinstance(candidate, dict) else str(candidate)
+            
+            # Create a prompt for the reranker model to score relevance
+            prompt = f"Query: {query}\nDocument: {candidate_text}\nRelevance score (0-1):"
+            
+            request_data = {
+                "model": self.model,
+                "prompt": prompt,
+                "stream": False,
+                "options": {
+                    "temperature": 0.1,  # Low temperature for consistent scoring
+                    "num_predict": 10    # Short response for score
+                }
+            }
+            
+            response = self.make_request("POST", "/api/generate", data=request_data)
+            
+            if response.success:
+                response_text = response.data.get("response", "0.0").strip()
+                try:
+                    # Extract numerical score from response
+                    import re
+                    score_match = re.search(r'(\d+\.?\d*)', response_text)
+                    score = float(score_match.group(1)) if score_match else 0.0
+                    # Ensure score is between 0 and 1
+                    score = max(0.0, min(1.0, score))
+                except (ValueError, AttributeError):
+                    score = 0.0
+            else:
+                score = 0.0
+            
+            scored_candidate = {
+                "text": candidate_text,
+                "score": score,
+                "original_index": i
+            }
+            
+            # Preserve original candidate structure if it's a dict
+            if isinstance(candidate, dict):
+                scored_candidate.update({k: v for k, v in candidate.items() if k != "text"})
+            
+            scored_candidates.append(scored_candidate)
+        
+        # Sort by score (descending)
+        reranked_candidates = sorted(scored_candidates, key=lambda x: x["score"], reverse=True)
+        
+        return APIResponse(
+            success=True,
+            data={"reranked_candidates": reranked_candidates},
+            metadata={
+                "model": self.model,
+                "reranking_method": "dedicated_reranker",
+                "total_candidates": len(candidates),
+                "reranked_count": len(reranked_candidates)
+            }
+        )
+    
+    def _rerank_with_embeddings(self, query: str, candidates: List[Dict[str, Any]]) -> APIResponse:
+        """Re-rank using embedding similarity (fallback method)"""
+        # Get embedding for the query
+        query_embedding_response = self._get_embedding(query)
+        if not query_embedding_response.success:
+            return query_embedding_response
+        
+        query_embedding = query_embedding_response.data.get("embedding", [])
+        
+        # Get embeddings for all candidates and calculate similarity scores
+        scored_candidates = []
+        for i, candidate in enumerate(candidates):
+            candidate_text = candidate.get("text", "") if isinstance(candidate, dict) else str(candidate)
+            
+            candidate_embedding_response = self._get_embedding(candidate_text)
+            if candidate_embedding_response.success:
+                candidate_embedding = candidate_embedding_response.data.get("embedding", [])
+                
+                # Calculate cosine similarity
+                similarity_score = self._cosine_similarity(query_embedding, candidate_embedding)
+                
+                scored_candidate = {
+                    "text": candidate_text,
+                    "score": similarity_score,
+                    "original_index": i
+                }
+                
+                # Preserve original candidate structure if it's a dict
+                if isinstance(candidate, dict):
+                    scored_candidate.update({k: v for k, v in candidate.items() if k != "text"})
+                
+                scored_candidates.append(scored_candidate)
+            else:
+                # If embedding fails, assign a low score but keep the candidate
+                scored_candidate = {
+                    "text": candidate_text,
+                    "score": 0.0,
+                    "original_index": i,
+                    "embedding_error": candidate_embedding_response.error_message
+                }
+                if isinstance(candidate, dict):
+                    scored_candidate.update({k: v for k, v in candidate.items() if k != "text"})
+                scored_candidates.append(scored_candidate)
+        
+        # Sort by similarity score (descending)
+        reranked_candidates = sorted(scored_candidates, key=lambda x: x["score"], reverse=True)
+        
+        return APIResponse(
+            success=True,
+            data={"reranked_candidates": reranked_candidates},
+            metadata={
+                "model": self.model,
+                "reranking_method": "embedding_similarity",
+                "total_candidates": len(candidates),
+                "reranked_count": len(reranked_candidates)
+            }
+        )
+
+    def _get_embedding(self, text: str) -> APIResponse:
+        """Get embedding for text using Ollama"""
+        request_data = {
+            "model": self.model,
+            "prompt": text
+        }
+        
+        return self.make_request("POST", "/api/embeddings", data=request_data)
+    
+    def _cosine_similarity(self, vec1: List[float], vec2: List[float]) -> float:
+        """Calculate cosine similarity between two vectors"""
+        if not vec1 or not vec2 or len(vec1) != len(vec2):
+            return 0.0
+        
+        try:
+            import math
+            
+            # Calculate dot product
+            dot_product = sum(a * b for a, b in zip(vec1, vec2))
+            
+            # Calculate magnitudes
+            magnitude1 = math.sqrt(sum(a * a for a in vec1))
+            magnitude2 = math.sqrt(sum(a * a for a in vec2))
+            
+            # Avoid division by zero
+            if magnitude1 == 0.0 or magnitude2 == 0.0:
+                return 0.0
+            
+            return dot_product / (magnitude1 * magnitude2)
+        except Exception:
+            return 0.0
+
+
 class APIManager:
     """Manager for coordinating multiple API providers"""
 
@@ -503,6 +734,11 @@ class APIManager:
             "cross_encoder": {
                 "model_url": config.api.cross_encoder_url,
                 "api_key": config.api.cross_encoder_api_key
+            },
+            "ollama_rerank": {
+                "base_url": getattr(config.api, 'ollama_base_url', 'http://localhost:11434'),
+                "model": getattr(config.api, 'ollama_model', 'nomic-embed-text'),
+                "api_key": getattr(config.api, 'ollama_api_key', None)
             }
         }
 
@@ -555,6 +791,14 @@ class APIManager:
                     model_url=config_data["model_url"],
                     api_key=config_data.get("api_key")
                 )
+
+        elif name == "ollama_rerank":
+            config_data = self.provider_configs.get("ollama_rerank", {})
+            return OllamaRerankProvider(
+                base_url=config_data.get("base_url", "http://localhost:11434"),
+                model=config_data.get("model", "nomic-embed-text"),
+                api_key=config_data.get("api_key")
+            )
 
         return None
 

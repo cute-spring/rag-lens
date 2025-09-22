@@ -552,9 +552,9 @@ The implementation involves multiple components working together:
 ### Conclusion:
 This concept serves as a foundation for more advanced topics in {topic}.
             """,
-            "publish_time": publish_time,
-            "effective_time": effective_time,
-            "expiration_time": expiration_time,
+            "publish_time": publish_time.isoformat(),
+            "effective_time": effective_time.isoformat(),
+            "expiration_time": expiration_time.isoformat(),
             "user_rating": random.randint(0, 5),
             "relevance_score": relevance_score,
             "freshness_score": freshness_score,
@@ -638,8 +638,21 @@ class RAGPipelineSimulator:
         """Reset the pipeline state"""
         self.current_step = 0
         self.step_results = {}
+
+        # Process chunks to ensure scores are present without modifying original
+        processed_chunks = []
+        for chunk in self.test_case["chunks"]:
+            new_chunk = chunk.copy()
+            if "relevance_score" not in new_chunk or new_chunk["relevance_score"] is None:
+                new_chunk["relevance_score"] = 0.0
+            if "freshness_score" not in new_chunk or new_chunk["freshness_score"] is None:
+                new_chunk["freshness_score"] = 0.0
+            if "quality_score" not in new_chunk or new_chunk["quality_score"] is None:
+                new_chunk["quality_score"] = 0.0
+            processed_chunks.append(new_chunk)
+
         self.intermediate_data = {
-            "retrieved_chunks": self.test_case["chunks"],  # Start with pre-collected chunks
+            "retrieved_chunks": processed_chunks,  # Start with processed chunks
             "filtered_chunks": None,
             "reranked_chunks": None,
             "selected_chunks": None,
@@ -747,20 +760,24 @@ class RAGPipelineSimulator:
 
     def _retrieve_chunks(self, chunks: List[Dict], query: str) -> List[Dict]:
         """Simulate initial retrieval"""
-        # Add default scores if missing
-        for chunk in chunks:
-            if "relevance_score" not in chunk:
-                chunk["relevance_score"] = 0.75
-        # Return chunks with higher relevance scores first
-        return sorted(chunks, key=lambda x: x["relevance_score"], reverse=True)
+        # Scores are now added in reset(), so we just sort
+        return sorted(chunks, key=lambda x: x.get("relevance_score", 0), reverse=True)
 
     def _initial_filter(self, chunks: List[Dict], threshold: float) -> List[Dict]:
         """Simulate initial filtering"""
-        return [chunk for chunk in chunks if chunk["relevance_score"] >= threshold]
+        # If all scores are 0, bypass filtering as they are not yet calculated
+        if all(c.get('relevance_score', 0) == 0 for c in chunks):
+            return chunks
+        return [chunk for chunk in chunks if chunk.get("relevance_score", 0) >= threshold]
 
     def _rerank_chunks(self, chunks: List[Dict], params: Dict[str, Any]) -> List[Dict]:
         """Simulate re-ranking with custom weights"""
         for chunk in chunks:
+            # Re-calculate scores for re-ranking
+            chunk["relevance_score"] = random.uniform(0.7, 1.0)
+            chunk["freshness_score"] = random.uniform(0.7, 1.0)
+            chunk["quality_score"] = random.uniform(0.7, 1.0)
+
             # Calculate composite score
             composite_score = (
                 chunk["relevance_score"] * params["semantic_weight"] +
@@ -1105,7 +1122,6 @@ The response has been generated using the specified system prompt and follows th
         }
 
 # Initialize data generator and generate mock data
-@st.cache_resource
 def load_mock_data():
     generator = MockDataGenerator()
     return [generator.generate_test_case(i) for i in range(5)]
@@ -1619,11 +1635,9 @@ def get_score_class(score: float) -> str:
     else:
         return "low"
 
-def render_initial_test_case_data(test_case: Dict[str, Any]):
+def render_initial_test_case_data(simulator: RAGPipelineSimulator):
     """Display initial test case data including chunks, metadata, and prompts"""
-    st.header("📋 Initial Test Case Data")
-    st.markdown(f"**Test Case:** {test_case['name']}")
-    st.markdown(f"**Description:** {test_case.get('description', test_case.get('purpose', 'No description available'))}")
+    test_case = simulator.test_case
 
     # Create tabs for different data views
     tab1, tab2, tab3 = st.tabs(["📝 Prompts & Query", "📊 Chunk Overview", "🔍 Chunk Details"])
@@ -1725,39 +1739,30 @@ def render_initial_test_case_data(test_case: Dict[str, Any]):
 
     with tab3:
         st.subheader("Chunk Details")
-        chunks = test_case["chunks"]
-
-        # Add default scores for compatibility with sorting
-        for chunk in chunks:
-            if "relevance_score" not in chunk:
-                chunk["relevance_score"] = 0.75  # Default relevance score
-            if "freshness_score" not in chunk:
-                chunk["freshness_score"] = 0.8  # Default freshness score
-            if "quality_score" not in chunk:
-                chunk["quality_score"] = 0.85  # Default quality score
+        chunks = simulator.intermediate_data["retrieved_chunks"]
 
         # Filtering and sorting options
         col1, col2, col3 = st.columns(3)
         with col1:
-            sort_by = st.selectbox("Sort by:", ["Relevance", "Freshness", "Quality", "Rating", "Title"])
+            sort_by = st.selectbox("Sort by:", ["Relevance", "Freshness", "Quality", "Rating", "Title"], key="tab3_sort_by")
         with col2:
-            sort_order = st.selectbox("Order:", ["Descending", "Ascending"])
+            sort_order = st.selectbox("Order:", ["Descending", "Ascending"], key="tab3_sort_order")
         with col3:
-            min_rating = st.slider("Min Rating", 0, 5, 0)
+            min_rating = st.slider("Min Rating", 0, 5, 0, key="tab3_min_rating")
 
         # Apply filters and sorting
-        filtered_chunks = [c for c in chunks if c["user_rating"] >= min_rating]
+        filtered_chunks = [c for c in chunks if c.get("user_rating", 0) >= min_rating]
 
         if sort_by == "Relevance":
-            filtered_chunks.sort(key=lambda x: x["relevance_score"], reverse=(sort_order == "Descending"))
+            filtered_chunks.sort(key=lambda x: x.get("relevance_score", 0), reverse=(sort_order == "Descending"))
         elif sort_by == "Freshness":
-            filtered_chunks.sort(key=lambda x: x["freshness_score"], reverse=(sort_order == "Descending"))
+            filtered_chunks.sort(key=lambda x: x.get("freshness_score", 0), reverse=(sort_order == "Descending"))
         elif sort_by == "Quality":
-            filtered_chunks.sort(key=lambda x: x["quality_score"], reverse=(sort_order == "Descending"))
+            filtered_chunks.sort(key=lambda x: x.get("quality_score", 0), reverse=(sort_order == "Descending"))
         elif sort_by == "Rating":
-            filtered_chunks.sort(key=lambda x: x["user_rating"], reverse=(sort_order == "Descending"))
+            filtered_chunks.sort(key=lambda x: x.get("user_rating", 0), reverse=(sort_order == "Descending"))
         elif sort_by == "Title":
-            filtered_chunks.sort(key=lambda x: x["title"], reverse=(sort_order == "Descending"))
+            filtered_chunks.sort(key=lambda x: x.get("title", ""), reverse=(sort_order == "Descending"))
 
         st.markdown(f"**Showing {len(filtered_chunks)} of {len(chunks)} chunks**")
 
@@ -3150,7 +3155,7 @@ def main():
 
     # Display initial test case data
     st.header("📋 Test Case Overview")
-    render_initial_test_case_data(selected_case)
+    render_initial_test_case_data(simulator)
 
     # Main content area based on mode
     if analysis_mode == "Step-by-Step Control":

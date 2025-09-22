@@ -145,6 +145,9 @@ class Config:
 
         # Load environment-specific settings
         self._load_environment_config()
+        
+        # Load API configuration from environment variables
+        self._load_api_config()
 
     def _detect_environment(self) -> Environment:
         """Detect current environment"""
@@ -166,6 +169,21 @@ class Config:
         else:  # DEVELOPMENT
             self.monitoring.log_level = "DEBUG"
             self.security.encrypt_sensitive_data = False
+    
+    def _load_api_config(self):
+        """Load API configuration from environment variables."""
+        import os
+        
+        # Ollama configuration
+        self.ollama_base_url = os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434')
+        self.ollama_model = os.getenv('OLLAMA_MODEL', 'llama2')
+        self.ollama_api_key = os.getenv('OLLAMA_API_KEY', '')
+        
+        # Other API configurations can be added here as needed
+        self.openai_api_key = os.getenv('OPENAI_API_KEY', '')
+        self.azure_api_key = os.getenv('AZURE_API_KEY', '')
+        self.elasticsearch_host = os.getenv('ELASTICSEARCH_HOST', 'localhost:9200')
+        self.cross_encoder_model = os.getenv('CROSS_ENCODER_MODEL', 'cross-encoder/ms-marco-MiniLM-L-6-v2')
 
     def get_test_source_path(self, display_name: str) -> str:
         """Get file path for test source"""

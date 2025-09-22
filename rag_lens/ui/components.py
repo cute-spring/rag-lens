@@ -623,6 +623,40 @@ class SettingsComponents(ComponentRenderer):
             value=api_config.get("timeout", 30)
         )
 
+        # Reranking Provider Configuration
+        st.markdown("**Reranking Provider**")
+        
+        reranking_provider = st.selectbox(
+            "Reranking Provider",
+            options=["cross_encoder", "ollama_rerank"],
+            format_func=lambda x: "Cross Encoder" if x == "cross_encoder" else "Ollama Rerank",
+            index=["cross_encoder", "ollama_rerank"].index(api_config.get("reranking_provider", "cross_encoder"))
+        )
+        
+        api_config["reranking_provider"] = reranking_provider
+        
+        if reranking_provider == "ollama_rerank":
+            st.markdown("**Ollama Configuration**")
+            
+            api_config["ollama_base_url"] = st.text_input(
+                "Ollama Base URL",
+                value=api_config.get("ollama_base_url", "http://localhost:11434"),
+                help="Base URL for Ollama API server"
+            )
+            
+            api_config["ollama_model"] = st.text_input(
+                "Ollama Model",
+                value=api_config.get("ollama_model", "llama2"),
+                help="Model name to use for embeddings and reranking"
+            )
+            
+            api_config["ollama_api_key"] = st.text_input(
+                "Ollama API Key (Optional)",
+                value=api_config.get("ollama_api_key", ""),
+                type="password",
+                help="API key if required by your Ollama setup"
+            )
+
         # Authentication
         st.markdown("**Authentication**")
 
